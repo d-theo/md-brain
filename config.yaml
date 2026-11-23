@@ -1,0 +1,32 @@
+# md-brain configuration. One block per project (= one folder of Markdown notes); each project is
+# indexed and served in isolation (own SQLite file under dataDir/<id>/, own Qdrant collection +
+# alias `md_<id>`).
+
+dataDir: ./data
+
+defaults:
+  embeddings:
+    provider: ollama
+    host: http://localhost:11434
+    model: qwen3-embedding:0.6b
+    dimensions: 1024
+    # Qwen3-Embedding task description, prepended to queries only (never to documents).
+    queryInstruction: Given a question, retrieve the sections of personal Markdown notes that answer it
+    batchSize: 32
+
+  qdrant:
+    url: http://localhost:6333
+
+  knowledge:
+    duplicateThreshold: 0.95
+    similarThreshold: 0.85
+
+projects:
+  # Example: adapt the root, then `mdb index notes --dry-run`.
+  notes:
+    name: Notes
+    root: ~/notes
+    # Defaults: include ["**/*.md", "**/*.markdown"], exclude [], maxFileBytes 524288.
+    exclude:
+      - "**/.env*"
+      - "**/archive/**"

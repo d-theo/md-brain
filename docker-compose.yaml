@@ -1,0 +1,49 @@
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.20.2
+    container_name: md-brain-qdrant
+    restart: unless-stopped
+
+    ports:
+      - "127.0.0.1:6333:6333"
+
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+    environment:
+      QDRANT__LOG_LEVEL: INFO
+
+  # Embedding model server (CPU by default). Port 11434 must be free: stop any Ollama installed
+  # on the host first.
+  ollama:
+    image: ollama/ollama:0.40.17
+    container_name: md-brain-ollama
+    restart: unless-stopped
+
+    ports:
+      - "127.0.0.1:11434:11434"
+
+    volumes:
+      - ollama_models:/root/.ollama
+
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # One-shot: downloads the embedding model if missing (no-op afterwards), then exits.
+  ollama-pull:
+    image: ollama/ollama:0.40.17
+    container_name: md-brain-ollama-pull
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    entrypoint: ["ollama", "pull", "qwen3-embedding:0.6b"]
+    restart: "no"
+
+volumes:
+  qdrant_data:
+  ollama_models:

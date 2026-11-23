@@ -1,0 +1,13 @@
+# Reference queries of a project: copy to eval/<project>.yaml and replace with real questions
+# about your notes, then run `mdb eval <project>`. `expect` lists substrings of the expected
+# result locations (`folder/note.md`, or `note.md:L12` for an exact section).
+thresholds:
+  recallAt5: 0.8
+  mrrAt10: 0.7
+queries:
+  - id: proxy-docker
+    query: comment configurer le proxy de docker
+    expect: [work/docker.md]
+  - id: pasta
+    query: how long do I cook spaghetti
+    expect: [personal/recipes/pasta.md]
